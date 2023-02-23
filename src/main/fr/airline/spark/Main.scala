@@ -9,12 +9,28 @@ object Main {
 
     implicit val airlineEncoder: Encoder[Airline] = Encoders.bean[Airline](classOf[Airline])
 
-    var result = file
+
+    val my_cache = file
       .map(s => Airline.fromColumn(s.split(",")))
+      .rdd
+      .cache()
+
+    val result = my_cache
+      .filter(airline => airline.get_cancelled == 0 && airline.get_distance != 0)
       .count()
 
     println("Count : " + result)
 
-    spark.stop();
+    val dist_sum = my_cache
+      .cache()
+      .aggregate(0.toLong)(
+        (acc, airline) => acc + airline.get_distance.toLong,
+        (acc1, acc2) => acc1 + acc2
+      )
+
+    println("Sum : " + dist_sum)
+    println("Mean : " + dist_sum / result)
+
+    spark.stop()
   }
 }
