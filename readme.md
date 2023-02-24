@@ -1,0 +1,48 @@
+# Analyse du fichier
+
+- Nombre de ligne : 123 534 969
+- Nombre de vol par année :
+    - 1987 = 1 311 826 vols
+    - 1988 = 5 202 096 vols
+    - 1989 = 5 041 200 vols
+    - 1990 = 5 270 893 vols
+    - 1991 = 5 076 925 vols
+    - 1992 = 5 092 157 vols
+    - 1993 = 5 070 501 vols
+    - 1994 = 5 180 048 vols
+    - 1995 = 5 327 435 vols
+    - 1996 = 5 351 983 vols
+    - 1997 = 5 411 843 vols
+    - 1998 = 5 384 721 vols
+    - 1999 = 5 527 884 vols
+    - 2000 = 5 683 047 vols
+    - 2001 = 5 967 780 vols
+    - 2002 = 5 271 359 vols
+    - 2003 = 6 488 540 vols
+    - 2004 = 7 129 270 vols
+    - 2005 = 7 140 596 vols
+    - 2006 = 7 141 922 vols
+    - 2007 = 7 453 215 vols
+    - 2008 = 7 009 728 vols
+- Nombre de vol par mois :
+    - Janvier = 10272489
+    - Février = 9431225
+    - Mars = 10448039
+    - Avril = 10081982
+    - Mai = 10330467
+    - Juin = 10226946
+    - Juillet = 10571942
+    - Août = 10646835
+    - Septembre = 10330467
+    - Octobre = 10758658
+    - Novembre = 10218176
+    - Décembre = 10572256
+- Nombre de vol par jour : (Somme des vols de chaque jours depuis 1987)
+    - Lundi = 18 136 111
+    - Mardi = 18 061 938
+    - Mercredi = 18 103 222
+    - Jeudi = 18 083 800
+    - Vendredi = 18 091 338
+    - Samedi = 15 915 382
+    - Dimanche = 17 143 178
+- Moyenne de distance : 700.5511382206289 miles (1127,4259392 km)
