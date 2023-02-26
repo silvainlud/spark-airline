@@ -23,6 +23,9 @@ object Main {
     println("Moyenne de temps de vol : " + meanDurationOfFlight(my_cache))
     println("Moyenne de temps de vol par année : " + meanDurationOfFlightPerYear(my_cache).collect().mkString(", "))
     println("Moyenne de la distance de vol : " + meanDistanceOfFlight(my_cache))
+    println("Nombre de vol par compagnie aérienne : " + countNumberOfFlightPerAirline(my_cache).collect().mkString(", "))
+    println("Nombre de vol par compagnie aérienne par année : " + countNumberOfFlightPerAirlinePerYear(my_cache).collect().mkString(", "))
+    println("Les destinations selon leurs fréquentations : " + countDestination(my_cache).collect().mkString(", "))
 
 
     spark.stop()
@@ -103,5 +106,29 @@ object Main {
     airline
       .map(airline => airline.get_distance.toLong)
       .mean()
+  }
+
+
+  /**
+   * Compte le nombre de vol par origine
+   * @param airline
+   * @return
+   */
+  def countDestination(airline: RDD[Airline]): RDD[(String, Long)] = {
+    airline
+      .map(airline => (airline.get_dest, 1.toLong))
+      .reduceByKey(_ + _)
+  }
+
+  def countNumberOfFlightPerAirlinePerYear(airline: RDD[Airline]): RDD[((String, Int), Long)] = {
+    airline
+      .map(airline => ((airline.get_unique_carrier, airline.get_year), 1.toLong))
+      .reduceByKey(_ + _)
+  }
+
+  def countNumberOfFlightPerAirline(airline: RDD[Airline]): RDD[(String, Long)] = {
+    airline
+      .map(airline => (airline.get_unique_carrier, 1.toLong))
+      .reduceByKey(_ + _)
   }
 }
