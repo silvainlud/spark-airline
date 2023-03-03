@@ -1,6 +1,7 @@
 package fr.airline.spark
 
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, Dataset, Encoder, Encoders, SparkSession}
 object Main {
 
@@ -8,6 +9,8 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder.appName("Simple Application").getOrCreate()
+
+    val sc = spark.sparkContext
     import spark.implicits._
 
     val airlineFile = spark.read.textFile(args(0)).cache()
@@ -22,37 +25,37 @@ object Main {
     implicit val exportedAirlineEncoder: Encoder[ExportedAirline] = Encoders.bean[ExportedAirline](classOf[ExportedAirline])
 
 
-    var airport_cache = airportFile
+    val airport_cache = airportFile
       .map(s => Airport.fromColumn(s.split(",")))
       .rdd
-      .cache()
-
-
-    //Count number of airport
-    println("Number of airport : " + airport_cache.count())
-    println("Number of airport per state : " + airport_cache.map(airport => (airport.getIso_region, 1.toLong)).reduceByKey(_ + _).collect().mkString(", "))
-
-
-
-
     val airline_cache = airlineFile
       .map(s => Airline.fromColumn(s.split(",")))
       .rdd
-      .cache()
+//
+//
+//    //Count number of airport
+//    println("Number of airport : " + airport_cache.count())
+//    println("Number of airport per state : " + airport_cache.map(airport => (airport.getIso_region, 1.toLong)).reduceByKey(_ + _).collect().mkString(", "))
 
-    var airportMapForJoin = airport_cache.map(airport  => (airport.getIata_code, airport))
+
+    //continent, coordinates, elevation_ft, gps_code, iata_code, ident, iso_country, iso_region, local_code, municipality, name, type
+    val airportDF = airport_cache.toDF("continent","coordinates","elevation_ft","gps_code","iata_code","ident","iso_country","iso_region","local_code","municipality","name","type")
+    //_actual_elapsed_time, _air_time, _arr_delay, _arr_time, _cancellation_code, _cancelled, _carrier_delay, _crs_arr_time, _crs_dep_time, _crs_elapsed_time, _day_of_month, _day_of_week, _dep_delay, _dep_time, _dest, _distance, _diverted, _flight_num, _late_aircraft_delay, _month, _nas_delay, _origin, _security_delay, _tail_num, _taxi_in, _taxi_out, _unique_carrier, _weather_delay, _year
+    val airlineDF = airline_cache.toDF("actual_elapsed_time", "air_time", "arr_delay", "arr_time", "cancellation_code", "cancelled", "carrier_delay", "crs_arr_time", "crs_dep_time", "crs_elapsed_time", "day_of_month", "day_of_week", "dep_delay", "dep_time", "dest", "distance", "diverted", "flight_num", "late_aircraft_delay", "month", "nas_delay", "origin", "security_delay", "tail_num", "taxi_in", "taxi_out", "unique_carrier", "weather_delay", "year")
+
 
     // Join airline with the origin airport
-    val airlineWithOriginAirport = airline_cache
-      .map(airline => (airline.get_origin, airline))
-      .join(airportMapForJoin)
-      .map(tuple => ExportedAirline.apply(tuple._2._1, tuple._2._2))
-      .cache()
+//    val airlineWithOriginAirport = airline_cache
+//      .map(airline => (airline.get_origin, airline))
+//      .join(, Seq("id"))
+//      .map(tuple => ExportedAirline.apply(tuple._2._1, tuple._2._2))
 
+    val finalVar = airlineDF.join(airportDF, airlineDF("origin") === airportDF("iata_code"), "left_outer")
+      //.select("actual_elapsed_time", "air_time", "arr_delay", "arr_time", "cancellation_code", "cancelled", "carrier_delay", "crs_arr_time", "crs_dep_time", "crs_elapsed_time", "day_of_month", "day_of_week", "dep_delay", "dep_time", "dest", "distance", "diverted", "flight_num", "late_aircraft_delay", "month", "nas_delay", "origin", "security_delay", "tail_num", "taxi_in", "taxi_out", "unique_carrier", "weather_delay", "year", "continent", "coordinates", "elevation_ft", "gps_code", "iata_code", "ident", "iso_country", "iso_region", "local_code", "municipality", "name", "type")
+      //.as[ExportedAirline]
 
-
-
-    toParquet(airlineWithOriginAirport.toDF(), "/airline.parquet");
+    (finalVar.write).parquet("/airline.parquet")
+    //toParquet(airlineWithOriginAirport.toDF(), "/airline.parquet");
 
 //    println("Nombre de ligne : " + countNumberOfLine(airline_cache))
 //    println("Nombre de vol par année : " + countNumberOfFlightPerYear(airline_cache).collect().mkString(", "))
