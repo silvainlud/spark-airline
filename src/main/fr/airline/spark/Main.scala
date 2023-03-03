@@ -36,13 +36,16 @@ object Main {
 //    //Count number of airport
 //    println("Number of airport : " + airport_cache.count())
 //    println("Number of airport per state : " + airport_cache.map(airport => (airport.getIso_region, 1.toLong)).reduceByKey(_ + _).collect().mkString(", "))
-
+    def airportDfWithPrefix(df: RDD[Airport], prefix: String): DataFrame = {
+      df.toDF(prefix + "_continent", prefix + "_coordinates", prefix + "_elevation_ft", prefix + "_gps_code", prefix + "_iata_code", prefix + "_ident", prefix + "_iso_country", prefix + "_iso_region", prefix + "_local_code", prefix + "_municipality", prefix + "_name", prefix + "_type")
+    }
 
     //continent, coordinates, elevation_ft, gps_code, iata_code, ident, iso_country, iso_region, local_code, municipality, name, type
     val airportDF = airport_cache.toDF("continent","coordinates","elevation_ft","gps_code","iata_code","ident","iso_country","iso_region","local_code","municipality","name","type")
     //_actual_elapsed_time, _air_time, _arr_delay, _arr_time, _cancellation_code, _cancelled, _carrier_delay, _crs_arr_time, _crs_dep_time, _crs_elapsed_time, _day_of_month, _day_of_week, _dep_delay, _dep_time, _dest, _distance, _diverted, _flight_num, _late_aircraft_delay, _month, _nas_delay, _origin, _security_delay, _tail_num, _taxi_in, _taxi_out, _unique_carrier, _weather_delay, _year
     val airlineDF = airline_cache.toDF("actual_elapsed_time", "air_time", "arr_delay", "arr_time", "cancellation_code", "cancelled", "carrier_delay", "crs_arr_time", "crs_dep_time", "crs_elapsed_time", "day_of_month", "day_of_week", "dep_delay", "dep_time", "dest", "distance", "diverted", "flight_num", "late_aircraft_delay", "month", "nas_delay", "origin", "security_delay", "tail_num", "taxi_in", "taxi_out", "unique_carrier", "weather_delay", "year")
 
+    val airportOriginDf = airportDfWithPrefix(airport_cache, "origin")
 
     // Join airline with the origin airport
 //    val airlineWithOriginAirport = airline_cache
@@ -50,7 +53,7 @@ object Main {
 //      .join(, Seq("id"))
 //      .map(tuple => ExportedAirline.apply(tuple._2._1, tuple._2._2))
 
-    val finalVar = airlineDF.join(airportDF, airlineDF("origin") === airportDF("iata_code"), "left_outer")
+    val finalVar = airlineDF.join(airportOriginDf, airlineDF("origin") === airportOriginDf("origin_iata_code"), "left_outer")
       //.select("actual_elapsed_time", "air_time", "arr_delay", "arr_time", "cancellation_code", "cancelled", "carrier_delay", "crs_arr_time", "crs_dep_time", "crs_elapsed_time", "day_of_month", "day_of_week", "dep_delay", "dep_time", "dest", "distance", "diverted", "flight_num", "late_aircraft_delay", "month", "nas_delay", "origin", "security_delay", "tail_num", "taxi_in", "taxi_out", "unique_carrier", "weather_delay", "year", "continent", "coordinates", "elevation_ft", "gps_code", "iata_code", "ident", "iso_country", "iso_region", "local_code", "municipality", "name", "type")
       //.as[ExportedAirline]
 
@@ -71,7 +74,6 @@ object Main {
 
     spark.stop()
   }
-
   def toParquet(df: DataFrame, dest: String): Unit = {
     df.write.parquet(dest)
   }
