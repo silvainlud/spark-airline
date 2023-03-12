@@ -286,4 +286,16 @@ object Airline {
   private def parseInt(columns: Array[String], x: Int) = if (columns(x) == "NA") 0 else columns(x).toInt
 
   private def parseBoolean(columns: Array[String], x: Int) = if (columns(x) == "NA") false else columns(x).toInt
+
+  def get_serial_number(tail_num: String): String = {
+    if (tail_num == null || tail_num == "NA") {
+      return null
+    }
+    if (tail_num.startsWith("N")) {
+      return tail_num.substring(1)
+    }
+    return tail_num
+
+
+  }
 }
