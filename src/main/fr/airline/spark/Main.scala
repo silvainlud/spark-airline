@@ -95,6 +95,12 @@ object Main {
     spark.stop()
   }
 
+  /**
+   * Exporte le dataframe en parquet
+   *
+   * @param df
+   * @param dest
+   */
   def toParquet(df: DataFrame, dest: String): Unit = {
     df.write.parquet(dest)
   }
