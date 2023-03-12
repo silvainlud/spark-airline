@@ -1,4 +1,4 @@
-package fr.airline.spark
+package fr.airline.spark.model
 
 class RegisteredPlane extends Serializable {
   private var serialNumber: String = null

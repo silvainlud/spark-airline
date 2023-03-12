@@ -1,4 +1,4 @@
-package fr.airline.spark
+package fr.airline.spark.model
 
 class ActRef extends Serializable{
   private var code: String = null

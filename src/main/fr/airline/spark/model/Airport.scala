@@ -1,4 +1,4 @@
-package fr.airline.spark
+package fr.airline.spark.model
 
 class Airport extends Serializable {
   private var ident: String = null

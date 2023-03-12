@@ -1,5 +1,6 @@
 package fr.airline.spark
 
+import fr.airline.spark.model.{ActRef, Airline, Airport, RegisteredPlane}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Encoder, Encoders, SparkSession}
 
