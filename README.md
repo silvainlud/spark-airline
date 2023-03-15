@@ -17,6 +17,12 @@
 Pour notre projet, nous avons sélectionné un dataset regroupant l’ensemble des vols commerciaux aux Etats Unis entre
 octobre 1987 et Avril 2008. Ce jeu de données est donc conséquent : 12Go pour environ 120 Millions d’entrées.
 
+Dataset :
+- shuffled_airline.csv : Un sous-ensemble du dataset original, contenant 10 000 vols
+- dataset_join/airport-codes.csv : Le dataset des aéroports
+- dataset_join/DEREG.csv : Le dataset des avions déréférencés
+- dataset_join/ACFTREF.csv : Le dataset des références pour les immatriculations d'avions
+
 ## Compilation
 
 Pour compiler le projet, il suffit de lancer la commande suivante :
@@ -30,8 +36,16 @@ mvn clean compile assembly:single -U
 Pour exécuter le projet, il suffit de lancer la commande suivante :
 
 ```bash
-spark-submit --deploy-mode client --class fr.airline.spark.Main target/SparkAirline-1.0-SNAPSHOT-jar-with-dependencies.jar <chemin sur le HDFS du dataset des vols> <chemin sur le HDFS du dataset des aéroports> <chemin sur le HDFS du dataset des avions déréférencés> <chemin sur le HDFS du dataset des références pour les immatriculations d\'avions>
+spark-submit --deploy-mode client --class fr.airline.spark.Main target/SparkAirline-1.0-SNAPSHOT-jar-with-dependencies.jar <chemin sur le HDFS du dataset des vols> <chemin sur le HDFS du dataset des aéroports> <chemin sur le HDFS du dataset des avions déréférencés> <chemin sur le HDFS du dataset des références pour les immatriculations d\'avions> <chemin sur le HDFS pour l\'exporation parquet>
 ```
+
+Exemple :
+
+```bash
+spark-submit --deploy-mode client --class fr.airline.spark.Main funWithSpark.jar hdfs://localhost:9000/shuffled_airline.csv hdfs://localhost:9000/airport-codes.csv hdfs://localhost:9000/DEREG.csv hdfs://localhost:9000/ACFTREF.csv hdfs://localhost:9000/shuffled_airline.parquet
+```
+
+**Attention : le dataset ne doit pas contenir les entêtes.**
 
 ## Structure du projet
 
