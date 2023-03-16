@@ -53,7 +53,7 @@ object Main {
       .rdd
 
 
-    // --- Static ---
+    // --- Statistique ---
 
 
     println("Nombre de ligne : " + countNumberOfLine(airline_cache))
@@ -69,6 +69,10 @@ object Main {
 
 
     // --- Jointure ---
+
+
+    // Extraction des informations par rapport à l'immatriculation pour la jointure avec la liste des avions donnés
+    // par Federal Aviation Administration
     airline_cache = airline_cache.map(x => {
       x.set_tail_num(Airline.get_serial_number(x.get_tail_num))
       x
@@ -77,12 +81,15 @@ object Main {
     val airlineDF = airline_cache.toDF("actual_elapsed_time", "air_time", "arr_delay", "arr_time", "cancellation_code", "cancelled", "carrier_delay", "crs_arr_time", "crs_dep_time", "crs_elapsed_time", "day_of_month", "day_of_week", "dep_delay", "dep_time", "dest", "distance", "diverted", "flight_num", "late_aircraft_delay", "month", "nas_delay", "origin", "security_delay", "tail_num", "taxi_in", "taxi_out", "unique_carrier", "weather_delay", "year")
 
 
+    // Ajout d'un prefix aux colonnes du dataframe des aéroports
     def airportDfWithPrefix(df: RDD[Airport], prefix: String): DataFrame = {
       df.toDF(prefix + "_continent", prefix + "_coordinates", prefix + "_elevation_ft", prefix + "_gps_code", prefix + "_iata_code", prefix + "_ident", prefix + "_iso_country", prefix + "_iso_region", prefix + "_local_code", prefix + "_municipality", prefix + "_name", prefix + "_type")
     }
 
     val airportOriginDf = airportDfWithPrefix(airport_cache, "origin")
     val airportDestinationDf = airportDfWithPrefix(airport_cache, "dest")
+
+    // Application des jointures
     val finalVar = airlineDF
       .join(airportOriginDf, airlineDF("origin") === airportOriginDf("origin_iata_code"), "left_outer")
       .join(airportDestinationDf, airlineDF("dest") === airportDestinationDf("dest_iata_code"), "left_outer")
