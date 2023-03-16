@@ -35,16 +35,6 @@ object Main {
       .map(s => ActRef.fromColumn(s.split(",")))
       .rdd.cache()
 
-    val actRef_pre_joined = actRef_cache.map(x => (x.getCode, x));
-
-
-    val registeredPlaneJoin = registeredPlane_cache
-      .map(x => (x.getMfrMDlCode, x))
-      .join(actRef_pre_joined)
-      .map(x => (x._2._1.getSerialNumber, x._2._2.getBrand, x._2._2.getModel))
-      .toDF("serial_number", "brand", "model")
-
-
     val airport_cache = airportFile
       .map(s => Airport.fromColumn(s.split(",")))
       .rdd
@@ -69,6 +59,18 @@ object Main {
 
 
     // --- Jointure ---
+
+
+    // Information sur le constructeur d'un avion
+    val actRef_pre_joined = actRef_cache.map(x => (x.getCode, x));
+
+
+    // Jointure entre la liste des avions enregistrés et les constructeur
+    val registeredPlaneJoin = registeredPlane_cache
+      .map(x => (x.getMfrMDlCode, x))
+      .join(actRef_pre_joined)
+      .map(x => (x._2._1.getSerialNumber, x._2._2.getBrand, x._2._2.getModel))
+      .toDF("serial_number", "brand", "model")
 
 
     // Extraction des informations par rapport à l'immatriculation pour la jointure avec la liste des avions donnés
